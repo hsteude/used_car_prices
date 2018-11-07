@@ -1,7 +1,7 @@
 ## import libraries for scarping
-import urllib3
 from bs4 import BeautifulSoup
 import requests
+import re
 
 
 # specify the url
@@ -16,14 +16,15 @@ offerings = soup.findAll("div", {"data-item-name": "listing-summary-container"})
 
 headline = []
 price = []
+details = []
 for offering in offerings:
     headline.append(offering.find('div',{'data-item-name':'headline'}).text)
     price.append(offering.find('span',{'data-item-name':'price'}).text)
+    details.append(offering.find('ul',{'data-item-name':'vehicle-details'}).text)
 
-headline
-
-'''
-html verstehen:
-oberste ebene fuer die liste der karren: 'div class = "cl-list-elemets" > == $0'
-danach kommen die einzelnen angebote mit id:'cl-list-elemet'
-'''
+headline = list(map(lambda x: re.sub('\n',' ',x), headline))
+price = list(map(lambda x: re.sub('MwSt. ausweisbar\n','',x), price))
+price = list(map(lambda x: x[3:-3], price))
+price
+price[0]
+price[0][3:-3]
