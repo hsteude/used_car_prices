@@ -13,11 +13,13 @@ import pandas as pd
 import plotly.offline as py
 import plotly.graph_objs as go
 import numpy as np
+import re
 
 #drop na rows
 
 #read all the files and merge them and remove duplicates first
-df_cars = pd.read_hdf('data/cars_2018-11-12_test.h5', mode='r')
+df_cars = pd.read_hdf('data/cars_2018-11-12.h5', mode='r')
+df_cars.info()
 df_cars = df_cars.dropna(subset=['state_str', 'features_str'])
 
 #split feature string in list
@@ -30,37 +32,37 @@ def extract_colour(list):
     try:
         return list[list.index('Außenfarbe')+1]
     except ValueError:
-        return None
+        return 'unknown'
 
 def extract_body_shape(list):
     try:
         return list[list.index('Karosserieform')+1]
     except ValueError:
-        return None
+        return 'unknown'
 
 def extract_interior(list):
     try:
         return list[list.index('Innenausstattung')+1]
     except ValueError:
-        return None
+        return 'unknown'
 
 def extract_painting(list):
     try:
         return list[list.index('Lackierung')+1]
     except ValueError:
-        return None
+        return 'unknown'
 
 def extract_HU(list):
     try:
         return list[list.index('HU Prüfung')+1]
     except ValueError:
-        return None
+        return 'unknown'
 
 def extract_checkbook(list):
     try:
         return list[list.index('Scheckheftgepflegt')+1]
     except ValueError:
-        return None
+        return 'unknown'
 
 df_cars['colour'] = df_cars.features_str.apply(extract_colour)
 df_cars['body_shape'] = df_cars.features_str.apply(extract_body_shape)
@@ -77,7 +79,6 @@ df_cars.head(3)
 ################################################################################
 
 ### build
-df_cars.build.unique()
 #create time Timestamp
 def timestamp_from_string(str):
     try:
@@ -89,13 +90,30 @@ df_cars['build'] = df_cars.build.apply(timestamp_from_string)
 
 ###gear
 df_cars.gear.unique()
-df_cars.loc[df_cars.gear == '-/- (Getriebeart)','gear'] = None
-
+df_cars.loc[df_cars.gear == '-/- (Getriebeart)','gear'] = 'unknown'
+data = [go.Histogram(x=df_cars.gear)]
+py.iplot(data, filename='basic histogram')
 ###headline
 #we leave this for now --> maybe tfidf later!
 
 ###horsepower
-df_cars.horsepower.unique()#looks fine to me
+df_cars.horsepower.unique()#run again and decide what to do
+
+
+def get_horesepower(str):
+    try:
+        return re.search(r"\((\w+)\s",str).group(1)
+    except AttributeError:
+        return 'NA'
+
+df_cars.loc[:,'horsepower'] = df_cars.horsepower.apply(get_horesepower)
+df_cars = df_cars[df_cars.horsepower != 'NA']
+df_cars.loc[:,'horsepower'] = pd.to_numeric(df_cars.horsepower)
+
+data = [go.Histogram(x=df_cars.horsepower)]
+py.iplot(data, filename='basic histogram')
+
+#convert to int
 
 ###id
 #is the number of unique id equal to the number of rows?
@@ -103,5 +121,86 @@ len(df_cars) == len(df_cars.id.unique())
 
 
 ###kilometers
-data = [go.Histogram(x=df_cars.price)]
+df_cars.loc[:,'kilometers'] = df_cars.kilometers.apply(lambda x: x.replace('.',''))
+len(df_cars.kilometers[df_cars.kilometers == '-'])
+df_cars = df_cars[df_cars.kilometers != '-']
+df_cars.loc[:,'kilometers'] = pd.to_numeric(df_cars.kilometers)
+len(df_cars.kilometers[df_cars.kilometers > 9e5])
+df_cars = df_cars[df_cars.kilometers < 9e5]
+
+
+data = [go.Histogram(x=df_cars.kilometers,nbinsx = 200)]
 py.iplot(data, filename='basic histogram') ###looks good like its measured in k
+
+
+###owners
+df_cars.owners.unique()
+df_cars.loc[df_cars['owners'] == '-', 'owners'] = 9999
+df_cars.loc[:,'owners'] = pd.to_numeric(df_cars.owners)
+len(df_cars[df_cars.owners>10])
+len(df_cars)
+
+###price
+df_cars.loc[:,'price'] = df_cars.price.apply(lambda x: x.replace('.',''))
+df_cars.loc[:,'price'] = pd.to_numeric(df_cars.price)
+len(df_cars.price[df_cars.price > 5e6])
+df_cars = df_cars[df_cars.price < 8e6]
+
+data = [go.Histogram(x=df_cars.price,nbinsx = 200)]
+py.iplot(data, filename='basic histogram')
+
+
+###used
+df_cars.used.unique() ##looks good
+data = [go.Histogram(x=df_cars.used,nbinsx = 200)]
+py.iplot(data, filename='basic histogram')
+
+
+##scrapeed
+df_cars.scraped.unique()
+
+
+###colour
+df_cars.colour.unique()
+data = [go.Histogram(x=df_cars.colour,nbinsx = 200)]
+py.iplot(data, filename='basic histogram')
+
+###bodzshape
+df_cars.body_shape.unique()
+data = [go.Histogram(x=df_cars.body_shape)]
+py.iplot(data, filename='basic histogram')
+
+###interior
+df_cars.interior.unique()
+
+data = [go.Histogram(x=df_cars.interior)]
+py.iplot(data, filename='basic histogram')
+
+###painting
+df_cars.painting.unique()
+
+data = [go.Histogram(x=df_cars.painting)]
+py.iplot(data, filename='basic histogram')
+
+
+###HU
+df_cars.HU.unique()
+
+data = [go.Histogram(x=df_cars.HU)]
+py.iplot(data, filename='basic histogram')
+
+###checkbook
+df_cars.checkbook.unique()
+
+
+df_cars.info()
+
+drop_columns = ['id','detail_link','state_str','features_str','checkbook',
+                'HU','painting']
+
+
+
+
+
+df_cars_cleaned =  df_cars.drop(drop_columns, axis=1)
+df_cars_cleaned
