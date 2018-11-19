@@ -148,7 +148,7 @@ def main():
     df_cars = pd.read_hdf('data/cars_cleaned.h5')
     fit = True
     df_preprossesed = preprocess_data(df_cars, fit)
-    df_preprossesed.to_hdf('data/df_preprossesed.h5',
+    df_preprossesed.to_hdf('data/cars_preprossesed.h5',
                      key='df_preprossesed',
                      mode='w')
 
