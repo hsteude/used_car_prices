@@ -147,10 +147,9 @@ df_cars = df_cars[df_cars.kilometers < 9e5]
 
 ###owners
 #df_cars.owners.unique()
-df_cars.loc[df_cars['owners'] == '-', 'owners'] = 9999
+df_cars.loc[df_cars['owners'] == '-', 'owners'] = 2 #mean of owners (roughly)
 df_cars.loc[:,'owners'] = pd.to_numeric(df_cars.owners)
-#len(df_cars[df_cars.owners>10])
-#len(df_cars)
+
 
 ###price
 df_cars.loc[:,'price'] = df_cars.price.apply(lambda x: x.replace('.',''))
