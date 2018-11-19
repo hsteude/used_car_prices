@@ -65,7 +65,7 @@ def car_table_from_summary_page(quote_page):
     details = list(map(lambda x: x.split('\n\n'), details))
     kilometers = list(map(lambda x: x[1][:-3], details))
     build = list(map(lambda x: x[2][2:], details))
-    horsepower = list(map(lambda x: x[3][-7:-4], details))#
+    horsepower = list(map(lambda x: x[3], details))#
     used = list(map(lambda x: x[4][1:], details))
     owners = list(map(lambda x: x[5][1], details))
     gear = list(map(lambda x: x[6][1:], details))
