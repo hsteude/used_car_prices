@@ -98,6 +98,7 @@ def get_numerical_cols(df_cars):
     numeric_cols = df_cars.select_dtypes('int').columns.tolist()
     df_num_cols = df_cars.copy()
     df_num_cols = df_num_cols[numeric_cols]
+    df_num_cols = df_num_cols.drop('price', axis = 1)
     return df_num_cols
 
 
@@ -147,9 +148,12 @@ def preprocess_data(df_cars, fit):
 def main():
     df_cars = pd.read_hdf('data/cars_cleaned.h5')
     fit = True
-    df_preprossesed = preprocess_data(df_cars, fit)
-    df_preprossesed.to_hdf('data/cars_preprossesed.h5',
-                     key='df_preprossesed',
+    X = preprocess_data(df_cars, fit)
+    X.to_hdf('data/X.h5',
+                     key='X',
+                     mode='w')
+    df_cars.price.to_hdf('data/y.h5',
+                     key='y',
                      mode='w')
 
 if __name__ == '__main__':
