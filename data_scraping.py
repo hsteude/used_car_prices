@@ -12,6 +12,10 @@ import requests
 import re
 import pandas as pd
 import time
+import os
+os.chdir('/home/ec2-user/used_car_prices')
+if not os.path.exists('data'):
+    os.makedirs('data')
 
 def create_links():
     '''
