@@ -6,39 +6,31 @@ Questions
 '''
 
 
-
-#import packages
+# import packages
 import pandas as pd
-import plotly.offline as py
-import plotly.graph_objs as go
-import plotly.tools as tls
-import plotly.figure_factory as ff
-import numpy as np
 import re
 import seaborn
 import datetime
-
-
 import copy
 
-
-#read data
+# read data
 df_cars = pd.read_hdf('data/cars_cleaned.h5', mode='r')
 df_cars.head()
-##create numeric feature with ange
-df_cars['age_in_days'] = df_cars.build.apply(lambda x: (datetime.datetime.today() - x).days)
+# create numeric feature with ange
+df_cars['age_in_days'] = df_cars.build.apply(
+    lambda x: (datetime.datetime.today() - x).days)
 
 
-df_for_pairsplot = df_cars.loc[:,['price',
-                                'horsepower',
-                                'kilometers',
-                                'age_in_days',
-                                'body_shape']]
+df_for_pairsplot = df_cars.loc[:, ['price',
+                                   'horsepower',
+                                   'kilometers',
+                                   'age_in_days',
+                                   'body_shape']]
 body_shapes = df_cars.body_shape.unique()
 
 fig_pairs = seaborn.pairplot(df_for_pairsplot, hue='body_shape',
-                         hue_order=body_shapes,
-                         vars= df_for_pairsplot.drop(['body_shape'],axis = 1).columns.values,
-                         plot_kws={'alpha': .3},
-                         diag_kind = 'reg')
-#fig_pairs.savefig("Figures_high_def/CFA_pairsplot_clusters.png", dpi=1000)
+                             hue_order=body_shapes,
+                             vars=df_for_pairsplot.drop(
+                                 ['body_shape'], axis=1).columns.values,
+                             plot_kws={'alpha': .3},
+                             diag_kind='reg')

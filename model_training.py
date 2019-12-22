@@ -1,29 +1,23 @@
-
+import warnings
 import pandas as pd
 import numpy as np
-
-
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
-from keras.models import Sequential, Model, load_model
-from keras.layers import Activation, Dense, Dropout
+from keras.models import Sequential
+from keras.layers import Dense, Dropout
 from keras.callbacks import ModelCheckpoint, TensorBoard
 import random
 random.seed(1)
-import warnings
 warnings.filterwarnings('ignore')
-import h5py
 
 
-
-
-#read data
+# read data
 X = pd.read_hdf('data/X.h5').values
-y = pd.read_hdf('data/y.h5').values.reshape(X.shape[0],-1)
+y = pd.read_hdf('data/y.h5').values.reshape(X.shape[0], -1)
 
 
 # create training and test dataset
-X_train, X_test, y_train, y_test = train_test_split(X,y, test_size=0.1)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.1)
 
 # Model Hyperparameters
 layer1_dense = X_train.shape[1]
@@ -69,11 +63,11 @@ history = model.fit(X_train, y_train,
                     batch_size=batchSize,
                     epochs=numEpochs,
                     verbose=1,
-                    validation_split = valSplit,
+                    validation_split=valSplit,
                     callbacks=[checkpointer, tensorboard]).history
 
 
-#Plot learning curve to identify next steps in hyperparameter tuning
+# Plot learning curve to identify next steps in hyperparameter tuning
 plt.plot(history['loss'])
 plt.plot(history['val_loss'])
 plt.title('model loss')
@@ -85,8 +79,9 @@ plt.show()
 
 predictions = model.predict(X_test)
 true_prices = y_test
-plt.scatter(true_prices,predictions, color = 'orange')
-plt.plot([min(true_prices), max(true_prices)],[min(true_prices), max(true_prices)])
+plt.scatter(true_prices, predictions, color='orange')
+plt.plot([min(true_prices), max(true_prices)],
+         [min(true_prices), max(true_prices)])
 plt.title('mdoel validation')
 plt.ylabel('true prices')
 plt.xlabel('predicted prices')
